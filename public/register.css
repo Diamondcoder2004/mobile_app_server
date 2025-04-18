@@ -1,0 +1,98 @@
+* {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "segoe ui", roboto, oxygen, ubuntu, cantarell, "fira sans", "droid sans", "helvetica neue", Arial, sans-serif;
+    font-size: 16px;
+}
+
+body {
+    background-color: #435165;
+}
+
+.register {
+    width: 500px;
+    background-color: #ffffff;
+    box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+    margin: 50px auto;
+    border-radius: 8px;
+}
+
+.register h1 {
+    text-align: center;
+    color: #5b6574;
+    font-size: 24px;
+    padding: 20px 0;
+    border-bottom: 1px solid #dee0e4;
+}
+
+.register form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.register form label {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #5b6574;
+}
+
+.register form input[type="text"], 
+.register form input[type="email"], 
+.register form input[type="password"],
+.register form input[type="phone_number"] {
+    width: 90%;
+    height: 45px;
+    border: 1px solid #dee0e4;
+    margin-bottom: 15px;
+    padding: 0 15px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.register form input[type="text"]:focus,
+.register form input[type="email"]:focus,
+.register form input[type="password"]:focus,
+.register form input[type="phone_number"]:focus {
+    border-color: #3274d6;
+    outline: none;
+    box-shadow: 0 0 5px rgba(50, 116, 214, 0.5);
+}
+
+.register form button {
+    width: 90%;
+    padding: 15px;
+    margin-top: 15px;
+    background-color: #3274d6;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff;
+    transition: background-color 0.3s ease;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.register form button:hover {
+    background-color: #2868c7;
+}
+
+.register p {
+    text-align: center;
+    color: #5b6574;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+.register p a {
+    color: #3274d6;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.register p a:hover {
+    text-decoration: underline;
+}
