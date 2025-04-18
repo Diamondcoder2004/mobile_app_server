@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Домашняя страница</title>
+  <link rel="stylesheet" href="/home_style.css">
+</head>
+<body>
+  <h1 id="welcomeMessage">С возвращением, пользователь!</h1>
+  <p>Ваш баланс: {{balance}} руб.</p>
+
+  
+  <h2>Пополнить баланс:</h2>
+  <form action="/user/top-up-balance" method="POST">
+    <input type="text" name="client_name" placeholder="Client_user_name" required />
+    <input type="number" name="amount" placeholder="Сумма" required />
+    <button type="submit">Пополнить</button>
+  </form>
+
+  <script>
+    // Функция для получения значения cookie по имени
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    // Получаем username из cookie
+    const username = getCookie('username');
+
+    // Обновляем текст приветствия
+    if (username) {
+      document.getElementById('welcomeMessage').textContent = `С возвращением, ${username}!`;
+    }
+  </script>
+</body>
+</html>
