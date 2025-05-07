@@ -1,62 +1,57 @@
 require("dotenv").config();
-
-const { supabase } = require('./supabase'); // Импортируем Supabase клиент
-
-const port = process.env.PORT || 3000; // Обратите внимание: обычно PORT пишется заглавными
-const cookieParser = require("cookie-parser");
-const queryRouter = require('./routes/queryRouter');
-const procRouter = require('./routes/procedureRouter');
-const functionRoutes = require("./routes/functionRouter");
-const userRouter = require("./routes/userRouter");
-const viewRouter = require("./routes/viewRouter");
-const path = require("path");
-const publicPath = path.join(__dirname, "public");
+const { supabase } = require('./supabase');
 const express = require('express');
+const path = require('path');
+const cookieParser = require("cookie-parser");
 const cors = require('cors');
-const exphbs = require('express-handlebars');
+
+const port = process.env.PORT || 3007; // Используем порт из .env или 3007
 
 const app = express();
 
+// Настройки CORS
 const allowedOrigins = [
-    'http://localhost:8081',
-    'http://192.168.0.112:8081',
     'http://localhost:8080',
+    'http://localhost:8081',
     'http://192.168.0.112:8080',
-    "https://curseproject-3.onrender.com"
+    'http://192.168.0.112:8081',
+    'https://curseproject-3.onrender.com'
 ];
 
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
         } else {
-            const msg = `Доступ с origin ${origin} запрещён политикой CORS`;
-            return callback(new Error(msg), false);
+            callback(new Error(`Доступ с origin ${origin} запрещён политикой CORS`), false);
         }
     },
     credentials: true,
     exposedHeaders: ['set-cookie']
 }));
 
+// Middleware
 app.use(cookieParser());
 app.use(express.json());
-app.use(express.static(publicPath));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Добавляем Supabase клиент в запросы, чтобы он был доступен в роутерах
+// Добавляем Supabase клиент в запросы
 app.use((req, res, next) => {
     req.supabase = supabase;
     next();
 });
 
-app.use('/api/query', queryRouter);
-app.use('/api/proc', procRouter);
-app.use("/api/function", functionRoutes);
-app.use("/api/view", viewRouter);
-app.use("/user", userRouter);
+// Маршруты
+app.use('/api/query', require('./routes/queryRouter'));
+app.use('/api/proc', require('./routes/procedureRouter'));
+app.use('/api/function', require('./routes/functionRouter'));
+app.use('/api/view', require('./routes/viewRouter'));
+app.use('/user', require('./routes/userRouter'));
 
-app.get("/", (req, res) => {
-    res.sendFile(path.join(publicPath, "login.html"));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.listen(port, () => console.log(`Сервер запущен на порту ${port}`));
+app.listen(port, () => {
+    console.log(`Сервер запущен на порту ${port}`);
+});
