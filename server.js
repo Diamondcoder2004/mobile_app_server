@@ -20,6 +20,8 @@ const app = express();
 const allowedOrigins = [
     'http://localhost:8081',
     'http://192.168.0.112:8081',
+    'http://localhost:8080',
+    'http://192.168.0.112:8080',
     "https://curseproject-3.onrender.com"
 ];
 
