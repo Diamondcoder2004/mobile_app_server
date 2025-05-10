@@ -1,67 +1,88 @@
-const pool = require("../db");
-const queries = require("../queries");
-
-
 const bookComputer = async (req, res) => {
- 
-    try {               
-        const input_user_id = req.cookies.user_id;
-        //console.log("cookies",req.cookies);
-        const { input_computer_name,  reservation_start_time,play_time_hours } = req.body;
-        const result = await pool.query(queries.book_computer, [ input_user_id, input_computer_name,  reservation_start_time, play_time_hours]);
-        res.status(200).json(result.rows[0]);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
+    const {  input_computer_name, reservation_start_time, play_time_hours } = req.body;
+
+
+    try {
+        const  input_user_id = req.cookies.user_id;
+        console.log("user_id from bookcomputer",  input_user_id);
+        console.log( input_user_id, input_computer_name);
+        const { data, error } = await req.supabase.rpc('book_computer', {
+            input_user_id,
+            input_computer_name,
+            reservation_start_time,
+            play_time_hours
+        });
+
+        if (error) throw error;
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 };
+
 
 const purchaseProduct = async (req, res) => {
+    const { input_product_name, input_quantity } = req.body;
     try {
-        const user_id = req.cookies.user_id;
-        console.log("user_id = ",user_id);
-        console.log("username",req.cookies.username);
-        const {product_name, quantity} = req.body;
-        console.log("quantity = ",quantity);
-        const result = await pool.query(queries.purchase_product, [user_id, product_name, quantity]);
-        res.status(200).json(result.rows[0]);
-    } catch (error) {
-         console.error(error);
-        res.status(500).json({ error: error.message });
+        const  input_user_id = req.cookies.user_id;
+        const { data, error } = await req.supabase.rpc('purchase_product', {
+            input_user_id,
+            input_product_name,
+            input_quantity
+        });
+
+        if (error) throw error;
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 };
-
 
 const topUpBalance = async (req, res) => {
+    const { target_username, amount } = req.body;
+    const admin_user_id = req.cookies.user_id;
     try {
-        const user_id = req.cookies.user_id;
-        const { client_name,amount } = req.body;
-         const result = await pool.query(queries.top_up_balance, [user_id ,client_name, amount]);
-        res.status(200).json(result.rows[0]);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
+        console.log("admin_user_id", admin_user_id);
+        console.log("target_user ",target_username);
+        const { data, error } = await req.supabase.rpc('top_up_balance', {
+            admin_user_id,
+            target_username,
+            amount
+        });
+
+        if (error) throw error;
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 };
-
-
 
 const createComputer = async (req, res) => {
+    const {
+        input_computer_name,
+        input_processor,
+        input_ram,
+        input_gpu,
+        input_zone_name
+    } = req.body;
+
+    const  input_user_id = req.cookies.user_id;
     try {
-      const user_id = req.cookies.user_id;
-      const {computer_name, processor,ram,gpu,zone_name,} = req.body;
-    
-    const result = await pool.query(queries.create_computer, [user_id,computer_name, processor,ram,gpu,zone_name ]);
-        res.status(201).json(result.rows[0]);
-    } catch (error) {
-        console.error(error);
-       res.status(500).json({ error: error.message });
+        const { data, error } = await req.supabase.rpc('create_computer', {
+            input_user_id,
+            input_computer_name,
+            input_processor,
+            input_ram,
+            input_gpu,
+            input_zone_name
+        });
+
+        if (error) throw error;
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 };
-
-
-
-
 
 module.exports = {
     bookComputer,

@@ -9,23 +9,10 @@ const port = process.env.PORT || 3007; // Используем порт из .en
 
 const app = express();
 
-// Настройки CORS
-const allowedOrigins = [
-    'http://localhost:8080',
-    'http://localhost:8081',
-    'http://192.168.0.112:8080',
-    'http://192.168.0.112:8081',
-    'https://curseproject-6.onrender.com'
-];
+
 
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error(`Доступ с origin ${origin} запрещён политикой CORS`), false);
-        }
-    },
+    origin: true, // Разрешает все источники
     credentials: true,
     exposedHeaders: ['set-cookie']
 }));
