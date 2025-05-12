@@ -12,4 +12,7 @@ router.get('/purchase-history', controller.getPurchaseHistory);
 
 router.post('/add-product', controller.addProduct);
 
+router.post('/reservation-cancel', controller.cancelReservation);
+
+
 module.exports = router;

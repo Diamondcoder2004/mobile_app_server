@@ -153,11 +153,66 @@ const addProduct = async (req, res) => {
   }
 };
 
+// controllers/cancelReservation.js
+
+const cancelReservation = async (req, res) => {
+  const { reservation_id } = req.body;
+  const userId = req.cookies.user_id;
+
+  // Проверка авторизации
+  if (!userId) {
+    return res.status(401).json({ error: 'Пользователь не авторизован' });
+  }
+
+  // Проверка входных данных
+  if (!reservation_id) {
+    return res.status(400).json({ error: 'Не указан ID бронирования' });
+  }
+
+  try {
+    // Проверяем, существует ли бронь и принадлежит ли она пользователю
+    const { data: reservation, error: fetchError } = await req.supabase
+        .from('reservations')
+        .select('*')
+        .eq('id', reservation_id)
+        .eq('user_id', userId)
+        .single();
+
+    if (fetchError) {
+      return res.status(404).json({ error: 'Бронирование не найдено' });
+    }
+
+    // Запрещаем отменять завершённые или уже отменённые брони
+    if (reservation.status === 'Completed') {
+      return res.status(400).json({ error: 'Невозможно отменить завершённое бронирование' });
+    }
+
+    if (reservation.status === 'Cancelled') {
+      return res.status(400).json({ error: 'Бронирование уже отменено' });
+    }
+
+    // Обновляем статус на 'Cancelled'
+    const { error: updateError } = await req.supabase
+        .from('reservations')
+        .update({ status: 'Cancelled' })
+        .eq('id', reservation_id);
+
+    if (updateError) throw updateError;
+
+    return res.status(200).json({ message: 'Бронирование успешно отменено' });
+  } catch (err) {
+    console.error('Ошибка при отмене бронирования:', err.message);
+    return res.status(500).json({ error: 'Не удалось отменить бронирование' });
+  }
+};
+
+
 
 module.exports = {
   getProducts,
   getReservationHistory,
   getPurchaseHistory,
   addProduct,
+  cancelReservation,
   };
   
