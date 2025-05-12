@@ -4,7 +4,7 @@ const queries = require("../queries");
 const monthly_report = async (req, res) => {
     const role_id = req.cookies.role_id;
 
-    if (role_id == 2) {
+    if (role_id == 3) {
         return res.status(403).json({ error: "Нет прав для получения месячного отчета" });
     }
 
@@ -25,7 +25,7 @@ const monthly_report = async (req, res) => {
 const morning_report = async (req, res) => {
     const role_id = req.cookies.role_id;
 
-    if (role_id == 2) {
+    if (role_id == 3) {
         return res.status(403).json({ error: "Нет прав для получения утреннего отчета" });
     }
 
@@ -46,7 +46,7 @@ const morning_report = async (req, res) => {
 const afternoon_report = async (req, res) => {
     const role_id = req.cookies.role_id;
 
-    if (role_id == 2) {
+    if (role_id == 3) {
         return res.status(403).json({ error: "Нет прав для получения дневного отчета" });
     }
 
@@ -67,7 +67,7 @@ const afternoon_report = async (req, res) => {
 const night_report = async (req, res) => {
     const role_id = req.cookies.role_id;
 
-    if (role_id == 2) {
+    if (role_id == 3) {
         return res.status(403).json({ error: "Нет прав для получения ночного отчета" });
     }
 

@@ -4,10 +4,11 @@ const controller = require("../controllers/functionController");
 const router = Router();
 
 router.get('/users', controller.getAllUsers);
-router.get('/sales-report', controller.getSalesReport);
+router.post('/sales-report', controller.getSalesReport);
 router.get('/get-balance',controller.getBalance);
 router.get('/available-zones',controller.available_zones);
-router.get("/available-pc",controller.available_pc);
+//Исправлено 11 мая
+router.post("/available-pc",controller.available_pc);
 
 
 module.exports = router;

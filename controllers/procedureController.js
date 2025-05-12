@@ -22,19 +22,52 @@ const bookComputer = async (req, res) => {
 
 
 const purchaseProduct = async (req, res) => {
-    const { input_product_name, input_quantity } = req.body;
     try {
-        const  input_user_id = req.cookies.user_id;
+        const { input_product_name, input_quantity } = req.body;
+        const input_user_id = req.cookies.user_id;
+
+        // Валидация входных данных
+        if (!input_product_name || !input_quantity || input_quantity <= 0) {
+            return res.status(400).json({
+                error: 'Неверные данные для заказа',
+                details: {
+                    input_product_name: !!input_product_name,
+                    input_quantity: input_quantity > 0
+                }
+            });
+        }
+
+        if (!input_user_id) {
+            return res.status(401).json({ error: 'Пользователь не авторизован' });
+        }
+
+        // Вызов PostgreSQL функции
         const { data, error } = await req.supabase.rpc('purchase_product', {
             input_user_id,
             input_product_name,
             input_quantity
         });
 
-        if (error) throw error;
-        res.status(200).json(data);
+        // Обработка ошибки на уровне Supabase
+        if (error) {
+            console.error('Ошибка при вызове purchase_product:', error);
+            return res.status(500).json({ error: error.message });
+        }
+
+        // Если функция вернула ошибку в поле `error`
+        if (data?.error) {
+            return res.status(400).json({ error: data.error });
+        }
+
+        // Успешный ответ
+        res.status(200).json({
+            message: 'Заказ успешно оформлен',
+            data
+        });
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Неожиданная ошибка:', err);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
     }
 };
 

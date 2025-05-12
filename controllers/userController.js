@@ -17,7 +17,7 @@ const secretKey = process.env.JWT_SECRET || "your_jwt_secret_key"; // Лучше
 const getLogin = async (req, res) => {
     urlencodedParser(req, res, async () => {
         const { username, password } = req.body;
-
+        console.log(username, password);
         try {
             // Получаем пользователя по имени
             const { data: user, error } = await supabase
@@ -85,6 +85,9 @@ const getLogin = async (req, res) => {
                 secure: true,
             });
 
+            console.log("user",res.cookie.user_id);
+
+
             // Ответ клиенту
             return res.status(200).json({
                 message: "Авторизация успешна",
@@ -113,21 +116,14 @@ const getRegister = async (req, res) => {
         const hashedPassword = password; // или bcrypt.hashSync(password, 10)
 
         // Добавляем пользователя в таблицу users
-        const { data, error } = await supabase
-            .from("users")
-            .insert([
-                {
-                    first_name: firstName,
-                    last_name: lastName,
-                    username: username,
-                    password: hashedPassword,
-                    phone_number: phone_number,
-                    email: email,
-                    role_id: 2, // например, роль по умолчанию — пользователь
-                },
-            ])
-            .select()
-            .single();
+        const { data, error } = await req.supabase.rpc("register_user", {
+            p_first_name: firstName,
+            p_last_name: lastName,
+            p_username: username,
+            p_password: hashedPassword,
+            p_phone: phone_number,
+            p_email: email,
+        });
 
         if (error) throw error;
 
@@ -135,9 +131,11 @@ const getRegister = async (req, res) => {
 
     } catch (error) {
         console.error("Error while registering user:", error);
-        res.status(500).json({ message: "Error while registering user", error: error.message });
+        res.status(500).json({ message: "Error while registering user", error: error.message});
     }
 };
+
+
 
 // Редирект на домашнюю страницу
 const getRedirectHome = async (req, res) => {
