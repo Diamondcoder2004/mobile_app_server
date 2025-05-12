@@ -5,8 +5,11 @@ const controller = require("../controllers/queryController");
 const router = Router();
 
 router.get("/products",controller.getProducts)
+router.get("/reservation-history",controller.getReservationHistory)
 
 
+router.get('/purchase-history', controller.getPurchaseHistory);
 
+router.post('/add-product', controller.addProduct);
 
 module.exports = router;
