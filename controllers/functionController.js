@@ -47,7 +47,11 @@ const getBalance = async (req, res) => {
 
         if (error) throw error;
 
-        res.status(200).json(data);
+        if (data.length > 0) {
+            res.status(200).json(data[0]); // Отправляем первый объект
+        } else {
+            res.status(404).json({ message: "Элемент не найден" });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: error.message });
@@ -57,7 +61,7 @@ const getBalance = async (req, res) => {
 const available_zones = async (req, res) => {
     try {
         const { data, error } = await req.supabase.rpc("available_zones");
-
+        console.log(data);
         if (error) throw error;
 
         res.status(200).json(data);

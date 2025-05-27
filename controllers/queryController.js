@@ -34,6 +34,7 @@ const getReservationHistory = async (req, res) => {
   }
 
   try {
+    // Запрашиваем бронирования с данными о компьютерах и зонах
     const { data, error } = await req.supabase
         .from('reservations')
         .select(`
@@ -44,7 +45,10 @@ const getReservationHistory = async (req, res) => {
         payment_amount,
         computers (
           computer_name,
-          zone_id
+          zone_id,
+          zones (
+            zone_name
+          )
         )
       `)
         .eq('user_id', userId)
@@ -52,7 +56,21 @@ const getReservationHistory = async (req, res) => {
 
     if (error) throw error;
 
-    res.status(200).json(data);
+    // Форматируем ответ: выносим zone_name на уровень компьютера
+    const formattedData = data.map((reservation) => {
+      const zoneName =
+          reservation.computers?.zones?.zone_name || 'Неизвестная зона';
+
+      return {
+        ...reservation,
+        computers: {
+          ...reservation.computers,
+          zone_name: zoneName,
+        },
+      };
+    });
+
+    res.status(200).json(formattedData);
   } catch (err) {
     console.error('Ошибка при загрузке истории бронирований:', err.message);
     res.status(500).json({ error: 'Не удалось загрузить историю бронирований' });

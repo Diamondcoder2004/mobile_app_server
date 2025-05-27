@@ -1,24 +1,31 @@
 const bookComputer = async (req, res) => {
-    const {  input_computer_name, reservation_start_time, play_time_hours } = req.body;
-
+    const { input_computer_name, reservation_start_time, play_time_hours } = req.body;
 
     try {
-        const  input_user_id = req.cookies.user_id;
-        console.log("user_id from bookcomputer",  input_user_id);
-        console.log( input_user_id, input_computer_name);
-        const { data, error } = await req.supabase.rpc('book_computer', {
-            input_user_id,
+        const input_user_id = req.cookies.user_id;
+        console.log("Cookies received:", req.cookies);
+        console.log("user_id from bookcomputer:", input_user_id);
+        console.log("Request body:", { input_user_id, input_computer_name, reservation_start_time, play_time_hours });
+
+        if (!input_user_id) {
+            return res.status(401).json({ error: "User not authenticated" });
+        }
+
+        const { data, error } = await req.supabase.rpc("book_computer", {
+            input_user_id: parseInt(input_user_id, 10), // Преобразуем в число
             input_computer_name,
             reservation_start_time,
-            play_time_hours
+            play_time_hours,
         });
 
         if (error) throw error;
         res.status(200).json(data);
     } catch (err) {
+        console.error("Error in bookComputer:", err);
         res.status(500).json({ error: err.message });
     }
 };
+
 
 
 const purchaseProduct = async (req, res) => {
@@ -73,14 +80,13 @@ const purchaseProduct = async (req, res) => {
 
 const topUpBalance = async (req, res) => {
     const { target_username, amount } = req.body;
-    const admin_user_id = req.cookies.user_id;
+    const user_id = req.cookies.user_id;
     try {
-        console.log("admin_user_id", admin_user_id);
+        console.log("user_id", user_id);
         console.log("target_user ",target_username);
         const { data, error } = await req.supabase.rpc('top_up_balance', {
-            admin_user_id,
-            target_username,
-            amount
+            target_user_id:user_id,
+            amount:amount
         });
 
         if (error) throw error;
@@ -89,6 +95,24 @@ const topUpBalance = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+const change_comp_status = async (req, res) => {
+    const { comp_name, new_status } = req.body;
+    const user_id = req.cookies.user_id;
+    try {
+        const { data, error } = await req.supabase.rpc('change_computer_status', {
+            p_user_id:user_id,
+            p_computer_name:comp_name,
+            p_status:new_status
+        });
+
+        if (error) throw error;
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 
 const createComputer = async (req, res) => {
     const {
@@ -122,4 +146,5 @@ module.exports = {
     purchaseProduct,
     topUpBalance,
     createComputer,
+    change_comp_status,
 };

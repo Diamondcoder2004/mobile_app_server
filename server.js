@@ -10,12 +10,12 @@ const port = process.env.PORT || 3007; // Используем порт из .en
 const app = express();
 
 
-
 app.use(cors({
     origin: true, // Разрешает все источники
     credentials: true,
     exposedHeaders: ['set-cookie']
 }));
+
 
 // Middleware
 app.use(cookieParser());
