@@ -11,11 +11,17 @@ const app = express();
 
 
 app.use(cors({
-    origin: true, // Разрешает все источники
+    origin: (origin, callback) => {
+        console.log('Origin:', origin);
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     exposedHeaders: ['set-cookie']
 }));
-
 
 // Middleware
 app.use(cookieParser());

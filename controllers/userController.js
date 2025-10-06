@@ -104,37 +104,37 @@ const getLogin = async (req, res) => {
                 httpOnly: true,
                 maxAge: 2 * 60 * 60 * 1000,
                 sameSite: "None",
-                secure: false,
+                secure: true,
             });
 
             res.cookie("lastName", encodeURIComponent(user.last_name), {
                 maxAge: 2 * 60 * 60 * 1000,
                 sameSite: "None",
-                secure: false,
+                secure: true,
             });
 
             res.cookie("firstName", encodeURIComponent(user.first_name), {
                 maxAge: 2 * 60 * 60 * 1000,
                 sameSite: "None",
-                secure: false,
+                secure: true,
             });
 
             res.cookie("username", user.username, {
                 maxAge: 2 * 60 * 60 * 1000,
                 sameSite: "None",
-                secure: false,
+                secure: true,
             });
 
             res.cookie("user_id", user.id, {
                 maxAge: 2 * 60 * 60 * 1000,
                 sameSite: "None",
-                secure: false,
+                secure: true,
             });
 
             res.cookie("role_id", user.role_id, {
                 maxAge: 2 * 60 * 60 * 1000,
                 sameSite: "None",
-                secure: false,
+                secure: true,
             });
 
             console.log("user",res.cookie.user_id);
