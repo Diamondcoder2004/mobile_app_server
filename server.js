@@ -10,17 +10,10 @@ const port = process.env.PORT || 3007; // Используем порт из .en
 const app = express();
 
 
+// ВМЕСТО сложной логики с allowedOrigins — используйте это:
 app.use(cors({
-    origin: (origin, callback) => {
-        console.log('Origin:', origin);
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    exposedHeaders: ['set-cookie']
+    origin: ['http://localhost:5173', 'https://computer-club-j8eo.onrender.com'],
+    credentials: true
 }));
 
 // Middleware
