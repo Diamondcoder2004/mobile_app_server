@@ -169,13 +169,13 @@ const getRegister = async (req, res) => {
     try {
         const { firstName, lastName, username, password, phone_number, email } = req.body;
 
-        // 🔍 Логируем извлечённые поля
+        //  Логируем извлечённые поля
         console.log("Извлечённые данные:", {
             firstName, lastName, username, password: password ? "[СКРЫТ]" : password,
             phone_number, email
         });
 
-        // ✅ Валидация обязательных полей
+        //  Валидация обязательных полей
         if (!password) {
             console.warn("❌ Отклонено: отсутствует пароль");
             return res.status(400).json({
@@ -192,15 +192,15 @@ const getRegister = async (req, res) => {
             });
         }
 
-        // 🔐 Хэширование пароля
+        //  Хэширование пароля
         console.log("Хэширование пароля...");
         const saltRounds = 10;
         let hashedPassword;
         try {
             hashedPassword = await bcrypt.hash(password, saltRounds);
-            console.log("✅ Пароль успешно хэширован");
+            console.log(" Пароль успешно хэширован");
         } catch (hashErr) {
-            console.error("❌ Ошибка хэширования пароля:", hashErr);
+            console.error(" Ошибка хэширования пароля:", hashErr);
             return res.status(500).json({
                 error: "Не удалось обработать пароль",
                 code: "PASSWORD_HASH_FAILED"
@@ -221,7 +221,7 @@ const getRegister = async (req, res) => {
         console.log("Ответ от Supabase RPC:", { data, error });
 
         if (error) {
-            console.error("❌ Ошибка Supabase (network-level):", error);
+            console.error(" Ошибка Supabase (network-level):", error);
             return res.status(500).json({
                 error: error.message || "Ошибка при вызове регистрации",
                 code: "SUPABASE_RPC_ERROR"
@@ -253,8 +253,8 @@ const getRegister = async (req, res) => {
             });
         }
 
-        // ✅ Успех
-        console.log("✅ Регистрация успешна. user_id:", data?.user_id);
+        //  Успех
+        console.log(" Регистрация успешна. user_id:", data?.user_id);
         return res.status(201).json({
             message: data?.message || "Пользователь зарегистрирован",
             user: {
@@ -264,7 +264,7 @@ const getRegister = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("💥 Необработанное исключение в getRegister:", err);
+        console.error(" Необработанное исключение в getRegister:", err);
         return res.status(500).json({
             error: "Внутренняя ошибка сервера",
             code: "INTERNAL_SERVER_ERROR"
