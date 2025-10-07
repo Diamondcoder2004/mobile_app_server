@@ -161,42 +161,86 @@ const getLogin = async (req, res) => {
 
 
 // Регистрация пользователя
+// Регистрация пользователя
 const getRegister = async (req, res) => {
+    console.log("=== Начало регистрации ===");
+    console.log("Тело запроса (req.body):", req.body);
+
     try {
         const { firstName, lastName, username, password, phone_number, email } = req.body;
 
-        // Хэширование пароля
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        // 🔍 Логируем извлечённые поля
+        console.log("Извлечённые данные:", {
+            firstName, lastName, username, password: password ? "[СКРЫТ]" : password,
+            phone_number, email
+        });
 
+        // ✅ Валидация обязательных полей
+        if (!password) {
+            console.warn("❌ Отклонено: отсутствует пароль");
+            return res.status(400).json({
+                error: "Поле 'password' обязательно",
+                code: "MISSING_PASSWORD"
+            });
+        }
+
+        if (!email || !username) {
+            console.warn("❌ Отклонено: отсутствуют email или username");
+            return res.status(400).json({
+                error: "Поля 'email' и 'username' обязательны",
+                code: "MISSING_REQUIRED_FIELDS"
+            });
+        }
+
+        // 🔐 Хэширование пароля
+        console.log("Хэширование пароля...");
+        const saltRounds = 10;
+        let hashedPassword;
+        try {
+            hashedPassword = await bcrypt.hash(password, saltRounds);
+            console.log("✅ Пароль успешно хэширован");
+        } catch (hashErr) {
+            console.error("❌ Ошибка хэширования пароля:", hashErr);
+            return res.status(500).json({
+                error: "Не удалось обработать пароль",
+                code: "PASSWORD_HASH_FAILED"
+            });
+        }
+
+        // 📡 Вызов RPC в Supabase
+        console.log("Вызов Supabase RPC 'register_user'...");
         const { data, error } = await supabase.rpc("register_user", {
             p_first_name: firstName,
             p_last_name: lastName,
             p_username: username,
-            p_password: hashedPassword, // Передаем хэшированный пароль
+            p_password: hashedPassword,
             p_phone: phone_number,
             p_email: email,
         });
 
-        if (error || data?.error) {
-            const errMessage = error?.message || data.error;
-            const errCode = data?.code || "UNKNOWN";
+        console.log("Ответ от Supabase RPC:", { data, error });
+
+        if (error) {
+            console.error("❌ Ошибка Supabase (network-level):", error);
+            return res.status(500).json({
+                error: error.message || "Ошибка при вызове регистрации",
+                code: "SUPABASE_RPC_ERROR"
+            });
+        }
+
+        if (data?.error) {
+            console.warn("⚠️ Ошибка от функции register_user:", data.error);
+            const errMessage = data.error;
+            const errCode = data.code || "UNKNOWN";
 
             let statusCode = 500;
             switch (errCode) {
                 case "USERNAME_EXISTS":
-                    statusCode = 409;
-                    break;
                 case "EMAIL_EXISTS":
-                    statusCode = 409;
-                    break;
                 case "PHONE_EXISTS":
                     statusCode = 409;
                     break;
                 case "ROLE_NOT_FOUND":
-                    statusCode = 500;
-                    break;
-                case "INTERNAL_ERROR":
                     statusCode = 500;
                     break;
                 default:
@@ -209,17 +253,24 @@ const getRegister = async (req, res) => {
             });
         }
 
+        // ✅ Успех
+        console.log("✅ Регистрация успешна. user_id:", data?.user_id);
         return res.status(201).json({
-            message: data.message,
+            message: data?.message || "Пользователь зарегистрирован",
             user: {
-                username: data.username,
-                user_id: data.user_id,
+                username: data?.username,
+                user_id: data?.user_id,
             },
         });
 
     } catch (err) {
-        console.error("Unexpected error during registration:", err);
-        return res.status(500).json({ error: "Internal server error", code: "INTERNAL_SERVER_ERROR" });
+        console.error("💥 Необработанное исключение в getRegister:", err);
+        return res.status(500).json({
+            error: "Внутренняя ошибка сервера",
+            code: "INTERNAL_SERVER_ERROR"
+        });
+    } finally {
+        console.log("=== Конец обработки регистрации ===\n");
     }
 };
 
