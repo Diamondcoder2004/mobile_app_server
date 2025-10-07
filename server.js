@@ -10,9 +10,13 @@ const port = process.env.PORT || 3007; // Используем порт из .en
 const app = express();
 
 
-// ВМЕСТО сложной логики с allowedOrigins — используйте это:
+// Парсим origins из .env
+const corsOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+    : ['http://localhost:8080'];
+
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://computer-club-j8eo.onrender.com'],
+    origin: corsOrigins,
     credentials: true
 }));
 

@@ -137,7 +137,7 @@ const getLogin = async (req, res) => {
                 secure: true,
             });
 
-            console.log("user",res.cookie.user_id);
+            console.log("user",user.id);
             // Ответ клиенту
             return res.status(200).json({
                 message: "Авторизация успешна",
